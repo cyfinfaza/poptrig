@@ -20,6 +20,7 @@
   "dependencies": {
     "evaluatex": "^2.2.0",
     "katex": "^0.15.1",
+    "mathjs": "^10.0.0",
     "sirv-cli": "^1.0.0"
   }
 }
