@@ -1,4 +1,4 @@
 # poptrig
 get trig gerred
-## build with
-svelte, supabase, and very minimal effort
+## built with
+svelte, supabase, and very little effort
