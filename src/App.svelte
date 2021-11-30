@@ -240,7 +240,7 @@
 		padding: 24px;
 		transition: var(--menu-transition);
 
-		transform: translateY(calc(-100% - 16px));
+		transform: translateY(calc(-100% - 32px));
 	}
 	.menuOpen > .menu {
 		transform: translateY(0);
