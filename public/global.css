@@ -5,7 +5,7 @@
 	--fg: #333;
 	--btn-shadow: #444;
 	--text: #FFF;
-	--accent: rgb(255, 238, 0);
+	--accent: #FE0;
 	--accent-text: #000;
 }
 
@@ -21,6 +21,14 @@ body {
 	padding: 16px;
 	box-sizing: border-box;
 	--katex-font-size: 1.4em;
+}
+
+button, input, select, textarea {
+	font-family: inherit;
+}
+
+button {
+	font-size: 1em;
 }
 
 .katex {

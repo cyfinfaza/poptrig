@@ -1,0 +1,17 @@
+{
+  "short_name": "PopTrig",
+  "name": "PopTrig",
+  "icons": [
+    {
+      "src": "/favicon.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#222222",
+  "display": "standalone",
+  "scope": "/",
+  "theme_color": "#FFEE00",
+  "description": "Trig practice for Mr. Boop's class"
+}
