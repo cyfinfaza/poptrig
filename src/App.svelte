@@ -126,7 +126,7 @@
 		<div class="vertiPanel">
 			<div class="horizSplit">
 				<h1>PopTrig</h1>
-				<div class="horizPanel">
+				<div class="horizPanel" style="align-items: stretch;">
 					<Button pad on:click={_=>menuOpen="leaderboardMenu"}>Leaderboard</Button>
 					{#if user}
 						<Button pad on:click={_=>menuOpen="accountMenu"} style="display: flex; align-items: center;">
