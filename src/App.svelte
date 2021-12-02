@@ -36,7 +36,7 @@
 	})(highScore);
 	let question;
 	let answer;
-	let menuOpen = false;
+	let menuOpen = "";
 	// $: menuOpen ? document.body.classList.add('menuOpen') : document.body.classList.remove('menuOpen');
 	function evaluateTexString(texString) {
 		let newTexString = texString.replaceAll("\\pi", "PI").replaceAll(/([0-9])\\/g, "$1*\\");
@@ -114,21 +114,29 @@
 		generateQuestion();
 		texInputs = [];
 	}
+	let leaderboard = null;
+	async function getLeaderboard(){
+		leaderboard = await (await fetch("/api/leaderboard")).json()
+	}
+	getLeaderboard();
 </script>
 
-<main class={menuOpen ? "menuOpen" : ""}>
+<main class={menuOpen ? "menuOpen "+menuOpen : ""}>
 	<div class="game">
 		<div class="vertiPanel">
 			<div class="horizSplit">
 				<h1>PopTrig</h1>
-				{#if user}
-					<Button pad on:click={_=>menuOpen=true} style="display: flex; align-items: center;">
-						<img src={user.user_metadata.avatar_url} alt="" style="width: 24px; height: 24px; border-radius: 50%;" />
-						<span style="margin-left: 8px">Me</span>
-					</Button>
-				{:else}
-					<Button pad on:click={_=>menuOpen=true}>Sign In</Button>
-				{/if}
+				<div class="horizPanel">
+					<Button pad on:click={_=>menuOpen="leaderboardMenu"}>Leaderboard</Button>
+					{#if user}
+						<Button pad on:click={_=>menuOpen="accountMenu"} style="display: flex; align-items: center;">
+							<img src={user.user_metadata.avatar_url} alt="" style="width: 24px; height: 24px; border-radius: 50%;" />
+							<span style="margin-left: 8px">Me</span>
+						</Button>
+					{:else}
+						<Button pad on:click={_=>menuOpen="accountMenu"}>Sign In</Button>
+					{/if}
+				</div>
 			</div>
 			<div class="horizSplit">
 				<!-- <div class="vertiPanel">
@@ -148,7 +156,7 @@
 		on:submit={submitAnswer}
 		/>
 	</div>
-	<div class="menu vertiPanel" on:blur={_=>menuOpen=false}>
+	<div class="menu accountMenu vertiPanel" on:blur={_=>menuOpen=false}>
 		<div class="horizSplit">
 			{#if user}
 				<h1>Account</h1>
@@ -161,11 +169,37 @@
 			<p>Hello, {user.user_metadata.full_name}. Thanks for signing in. Um, there's nothing really to do here, at least not yet. I guess you can sign out if you want...</p>
 			<Button pad on:click={async _=>{await supabase.auth.signOut(); window.localStorage.removeItem('highScore'); highScore = 0; dbHighScore=Infinity; score=0;}}>Sign out</Button>
 		{:else}
-			<p>Sign in to save your high score, and maybe be on the leaderboard (if I add one)</p>
+			<p>Sign in to save your high score and be on the leaderboard.</p>
 			<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
 				<Button pad on:click={_=>supabase.auth.signIn({provider:"google"})}>Sign in with Google</Button>
 				<Button pad on:click={_=>supabase.auth.signIn({provider:"discord"})}>Sign in with Discord</Button>
 			</div>
+		{/if}
+	</div>
+	<div class="menu leaderboardMenu vertiPanel" on:blur={_=>menuOpen=false}>
+		<div class="horizSplit">
+			<h1 style="font-size: 1.9em;">Leaderboard</h1>
+			<div class="horizPanel">
+				<Button pad on:click={_=>{
+					leaderboard = null;
+					getLeaderboard();
+				}}><span class="material-icons" style="font-size: 24px;">refresh</span></Button>
+				<Button pad on:click={_=>menuOpen=false}><span class="material-icons" style="font-size: 24px;">close</span></Button>
+			</div>
+		</div>
+		{#if leaderboard}
+			{#each leaderboard as entry, i}
+				<div class="horizSplit">
+					<div class="horizPanel">
+						<span>{i+1}.</span>
+						<img src={entry.avatar} alt="" style="width: 24px; height: 24px; border-radius: 50%;" />
+						<span>{entry.name}</span>
+					</div>
+					<span style="font-weight: bold;">{entry.score}</span>
+				</div>
+			{/each}
+		{:else} 
+			<p>Loading</p>
 		{/if}
 	</div>
 </main>
@@ -216,11 +250,16 @@
 	.horizSplit > * {
 		margin: 0;
 	}
+	.horizPanel {
+		display: flex;
+		align-items: center;
+		gap: 12px;
+	}
 	.vertiPanel {
 		display: flex;
 		flex-direction: column;
 		align-items: stretch;
-		justify-content: center;
+		/* justify-content: center; */
 		/* width: 100%;
 		height: 100%; */
 		gap: 12px;
@@ -231,7 +270,7 @@
 		/* right: 12px;
 		left: 12px; */
 		/* height: 300px; */
-		max-height: 100vh;
+		max-height: calc(100vh - 32px);
 		width: 100%;
 		box-sizing: border-box;
 		background-color: var(--bg);
@@ -239,10 +278,20 @@
 		border-radius: 12px;
 		padding: 24px;
 		transition: var(--menu-transition);
+		overflow: auto;
 
 		transform: translateY(calc(-100% - 32px));
 	}
-	.menuOpen > .menu {
+	/* .menu > *:first-child {
+		position: sticky;
+		top: 0;
+		background-color: var(--bg);
+		box-shadow: 0 0 8px 0px var(--bg);
+	} */
+	.menuOpen.leaderboardMenu > .leaderboardMenu {
+		transform: translateY(0);
+	}
+	.menuOpen.accountMenu > .accountMenu {
 		transform: translateY(0);
 	}
 </style>

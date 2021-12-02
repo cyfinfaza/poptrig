@@ -21,6 +21,7 @@ body {
 	padding: 16px;
 	box-sizing: border-box;
 	--katex-font-size: 1.4em;
+	word-wrap: break-word;
 }
 
 button, input, select, textarea {
