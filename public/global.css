@@ -24,6 +24,10 @@ body {
 	word-wrap: break-word;
 }
 
+a {
+	color: inherit;
+}
+
 button, input, select, textarea {
 	font-family: inherit;
 }

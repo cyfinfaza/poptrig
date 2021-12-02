@@ -149,12 +149,13 @@
 		</div>
 		<div class="problem" style="--katex-font-size: 40px"><Tex exp={question} /></div>
 		<div class="solution" style="--katex-font-size: 40px"><Tex exp={texInputs.join("")+"{}"} /></div>
-		<p style="margin: 0; text-align: center;">Evaluate the expression. Leave blank if undefined.</p>
+		<p style="margin: 0; text-align: center; font-size: 0.9em;">Evaluate the expression. Leave blank if undefined.</p>
 		<Keypad 
 		on:input={ ({detail:{content}}) => texInputs = [...texInputs, content] }
 		on:backspace={ () => texInputs = texInputs.slice(0, -1) }
 		on:submit={submitAnswer}
 		/>
+		<!-- <p style="font-size: 0.7em; margin: 0; text-align: center;">Built by <a href="https://cy2.me">Cy Westbrook</a>. This app is <a href="https://github.com/cyfinfaza/poptrig">open-source</a>.</p> -->
 	</div>
 	<div class="menu accountMenu vertiPanel" on:blur={_=>menuOpen=false}>
 		<div class="horizSplit">
@@ -226,7 +227,8 @@
 	}
 	.menuOpen > .game {
 		pointer-events: none;
-		filter: blur(32px);
+		filter: blur(28px);
+		transform: scale(0.84);
 		opacity: 0.5;
 	}
 	.solution {
