@@ -202,6 +202,7 @@
 		{:else} 
 			<p>Loading</p>
 		{/if}
+		<p style="margin: 0; font-size: 0.8em"><b>To my friends who's first thought it is to hack this game:</b> It is very easy to hack this game. Being able to hack this game does not make you cool. Please do not hack this game.</p>
 	</div>
 </main>
 
