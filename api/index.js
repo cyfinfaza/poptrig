@@ -88,7 +88,11 @@ app.get('/api/tg_play/highscore', async (req, res) => {
 		}
 	})
 	console.log(response.data)
-	res.json({score: response.data.result.filter(r => r.user.id == u)[0].score})
+	try {
+		res.json({score: response.data.result.filter(r => r.user.id == u)[0].score})
+	} catch (error) {
+		res.json({score: 0})
+	}
 	res.end()
 })
 
