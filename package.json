@@ -20,6 +20,7 @@
   },
   "dependencies": {
     "@supabase/supabase-js": "^1.28.2",
+    "axios": "^0.24.0",
     "evaluatex": "^2.2.0",
     "express": "^4.17.1",
     "katex": "^0.15.1",

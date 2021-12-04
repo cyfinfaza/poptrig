@@ -6,34 +6,61 @@
 	import Keypad from './Keypad.svelte';
 	import evaluatex from "evaluatex/dist/evaluatex";
 	import supabase from './supabaseClient'
+	let tgMode;
+	try {
+		tgMode = JSON.parse(atob(new URLSearchParams(window.location.search).get('tg_play')))
+	} catch (error) {
+		tgMode = null;
+	}
+	window.tgMode = tgMode
+	let tgShareScoreUrl = null;
+	if (tgMode) tgShareScoreUrl = new URLSearchParams(window.location.hash.substring(1)).get("tgShareScoreUrl")
 	let user = null;
-	let highScore = window.localStorage.getItem('highScore') || 0;
-	let dbHighScore = Infinity;
-	supabase.auth.onAuthStateChange(async (event, sess) => {
-		user = sess?.user;
-		if(user) {
-			let hs = await supabase.from("highscores").select("score");
-			if (hs.body[0]) {
-				dbHighScore = hs.data[0].score;
-				if(hs.body[0].score > highScore) highScore = hs.body[0].score;
-			} else {
-				dbHighScore = 0;
-			}
-			console.log("db highscore", hs)
-		}
-	});
 	$: console.log(user)
+	let dbHighScore = Infinity;
+	if (!tgMode) {
+		supabase.auth.onAuthStateChange(async (event, sess) => {
+			user = sess?.user;
+			if(user) {
+				let hs = await supabase.from("highscores").select("score");
+				if (hs.body[0]) {
+					dbHighScore = hs.data[0].score;
+					if(hs.body[0].score > highScore) highScore = hs.body[0].score;
+				} else {
+					dbHighScore = 0;
+				}
+				console.log("db highscore", hs)
+			}
+		});
+	}
 	window.evaluatex = evaluatex;
 	let texInputs = [];
+	let highScore = tgMode ? 0 : window.localStorage.getItem('highScore') || 0;
+	if (tgMode) fetch(`/api/tg_play/highscore?u=${tgMode.u}&imref=${tgMode.imref}`).then(res => res.json()).then(res => {
+		// if (res.score > highScore) highScore = res.score;
+		console.log("tg highscore", res)
+		dbHighScore = res.score;
+		highScore = res.score;
+	});
 	let score = 0;
 	$: if(score > highScore) highScore = score;
 	$: (async (s) => {
-		console.log("new highscore ", s)
-		window.localStorage.setItem('highScore', s)
-		if(user && s > dbHighScore) {
-			console.log(await supabase.from("highscores").upsert({score: s}))
+		if (!tgMode) window.localStorage.setItem('highScore', s)
+		if (s > dbHighScore) {
+			console.log("new highscore ", s)
+			if (tgMode) {
+				const { u, imref } = tgMode;
+				await fetch('/api/tg_play/report', { method: 'POST', body: JSON.stringify({ u, imref, s }), headers: { 'Content-Type': 'application/json' } });
+			} else if(user) {
+				console.log(await supabase.from("highscores").upsert({score: s}))
+			}
 		}
 	})(highScore);
+	let leaderboard = null;
+	async function getLeaderboard(){
+		leaderboard = await (await fetch("/api/leaderboard")).json()
+	}
+	if (tgMode) getLeaderboard();
 	let question;
 	let answer;
 	let menuOpen = "";
@@ -114,11 +141,6 @@
 		generateQuestion();
 		texInputs = [];
 	}
-	let leaderboard = null;
-	async function getLeaderboard(){
-		leaderboard = await (await fetch("/api/leaderboard")).json()
-	}
-	getLeaderboard();
 </script>
 
 <main class={menuOpen ? "menuOpen "+menuOpen : ""}>
@@ -126,17 +148,24 @@
 		<div class="vertiPanel">
 			<div class="horizSplit">
 				<h1>PopTrig</h1>
-				<div class="horizPanel" style="align-items: stretch;">
-					<Button pad on:click={_=>menuOpen="leaderboardMenu"}>Leaderboard</Button>
-					{#if user}
-						<Button pad on:click={_=>menuOpen="accountMenu"} style="display: flex; align-items: center;">
-							<img src={user.user_metadata.avatar_url} alt="" style="width: 24px; height: 24px; border-radius: 50%;" />
-							<span style="margin-left: 8px">Me</span>
-						</Button>
-					{:else}
-						<Button pad on:click={_=>menuOpen="accountMenu"}>Sign In</Button>
-					{/if}
-				</div>
+				{#if tgMode}
+					<div class="horizPanel">
+						<img src="Telegram_logo.svg" alt style="width: 32px; height: 32px;">
+						<span>{tgMode.username}</span>
+					</div>
+				{:else}
+					<div class="horizPanel" style="align-items: stretch;">
+						<Button pad on:click={_=>menuOpen="leaderboardMenu"}>Leaderboard</Button>
+						{#if user}
+							<Button pad on:click={_=>menuOpen="accountMenu"} style="display: flex; align-items: center;">
+								<img src={user.user_metadata.avatar_url} alt="" style="width: 24px; height: 24px; border-radius: 50%;" />
+								<span style="margin-left: 8px">Me</span>
+							</Button>
+						{:else}
+							<Button pad on:click={_=>menuOpen="accountMenu"}>Sign In</Button>
+						{/if}
+					</div>
+				{/if}
 			</div>
 			<div class="horizSplit">
 				<!-- <div class="vertiPanel">
