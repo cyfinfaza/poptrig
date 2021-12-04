@@ -10,8 +10,6 @@ const client = new Client({ connectionString })
 client.connect()
 
 const tbotApiKey = process.env.tb_key
-// set telegram bot webhook
-axios.get(`https://api.telegram.org/bot${tbotApiKey}/setWebhook?url=https://upstairs.cy2.me/api/webhook/tb`)
 
 app.get('/api/leaderboard', async (req, res) => {
 	let {rows} = await client.query('select highscores.score, auth.users.raw_user_meta_data from highscores inner join auth.users on highscores.owner=auth.users.id order by score DESC')
