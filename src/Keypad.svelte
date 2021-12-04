@@ -46,7 +46,7 @@
 <style>
 	.keypad {
 		display: grid;
-		grid-template-rows: repeat(4, 64px);
+		grid-template-rows: repeat(4, 60px);
 		/* grid-template-columns: repeat(4, 40px); */
 		grid-auto-flow: column;
 		gap: 10px;

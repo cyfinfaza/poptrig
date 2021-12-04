@@ -143,7 +143,7 @@
 	}
 </script>
 
-<main class={menuOpen ? "menuOpen "+menuOpen : ""}>
+<main class={menuOpen ? "menuOpen "+menuOpen : ""} style={tgMode ? "--accent: #32c3ff" : ""}>
 	<div class="game">
 		<div class="vertiPanel">
 			<div class="horizSplit">
